@@ -17,8 +17,52 @@ const region_options = {
   SE: 'Sweden',
 }
 
+function timestamp_from_date(date) {
+  let [dt, mth, yr] = date.split('/');
+  return Date.parse([mth, dt, yr].join('/'));
+}
+
 function init_state_data() {
   const data = { by_region: {}};
+}
+
+function init_frequency_data(raw_data, region='all') {
+  const frequency = {};
+  let max_frequency = 0;
+  const date_for_timestamp = {};
+  const len = raw_data.date.length;
+  for (var idx = 0; idx < len; ++idx) {
+    const timestamp = timestamp_from_date(raw_data.date[idx]);
+
+    date_for_timestamp[timestamp] = raw_data.date[idx];
+    frequency[timestamp] = frequency[timestamp] || 0
+
+    if (region === 'all') {
+      frequency[timestamp] = frequency[timestamp] + 1;
+      if (frequency[timestamp] > max_frequency) {
+        max_frequency = frequency[timestamp];
+      }
+    } else if (raw_data.region[idx] === region) {
+      frequency[timestamp] = frequency[timestamp] + 1;
+      if (frequency[timestamp] > max_frequency) {
+        max_frequency = frequency[timestamp];
+      }
+    }
+  }
+
+  const sorted_timestamp = Object.keys(date_for_timestamp).sort();
+  const sorted_dates = sorted_timestamp.map(x => date_for_timestamp[x]);
+  const sorted_len = sorted_dates.length;
+  const sorted_frequency = new Array(sorted_len);
+  for (var idx = 0; idx < sorted_len; ++idx) {
+    sorted_frequency[idx] = frequency[sorted_timestamp[idx]];
+  }
+
+  return {
+    frequency: sorted_frequency,
+    max_frequency,
+    date: sorted_dates,
+  };
 }
 
 const App = () => {
@@ -35,11 +79,6 @@ const App = () => {
 
   const [ui_state_chart_type, set_ui_state_chart_type] = useState("bar");
   const [ui_state_region, set_ui_state_region] = useState("all");
-
-  function timestamp_from_date(date) {
-    let [dt, mth, yr] = date.split('/');
-    return Date.parse([mth, dt, yr].join('/'));
-  }
 
   useEffect(() => {
     async function fetch_data() {
@@ -59,45 +98,6 @@ const App = () => {
     });
 
   }, []);
-
-  function init_frequency_data(raw_data, region='all') {
-    const frequency = {};
-    let max_frequency = 0;
-    const date_for_timestamp = {};
-    const len = raw_data.date.length;
-    for (var idx = 0; idx < len; ++idx) {
-      const timestamp = timestamp_from_date(raw_data.date[idx]);
-
-      date_for_timestamp[timestamp] = raw_data.date[idx];
-      frequency[timestamp] = frequency[timestamp] || 0
-
-      if (region === 'all') {
-        frequency[timestamp] = frequency[timestamp] + 1;
-        if (frequency[timestamp] > max_frequency) {
-          max_frequency = frequency[timestamp];
-        }
-      } else if (raw_data.region[idx] === region) {
-        frequency[timestamp] = frequency[timestamp] + 1;
-        if (frequency[timestamp] > max_frequency) {
-          max_frequency = frequency[timestamp];
-        }
-      }
-    }
-
-    const sorted_timestamp = Object.keys(date_for_timestamp).sort();
-    const sorted_dates = sorted_timestamp.map(x => date_for_timestamp[x]);
-    const sorted_len = sorted_dates.length;
-    const sorted_frequency = new Array(sorted_len);
-    for (var idx = 0; idx < sorted_len; ++idx) {
-      sorted_frequency[idx] = frequency[sorted_timestamp[idx]];
-    }
-
-    return {
-      frequency: sorted_frequency,
-      max_frequency,
-      date: sorted_dates,
-    };
-  }
 
   function handle_select_chart(el) {
     set_ui_state_chart_type(el.target.value);

@@ -4,7 +4,8 @@ import { useD3 } from './hooks';
 import D3Element from './d3element';
 
 const theme = {
-    fill: 'teal'
+    fill: 'teal',
+    anim_rate: 1000,
 };
 
 export const BarChart = ({xData, yData, yMax}) => {
@@ -26,13 +27,13 @@ export const BarChart = ({xData, yData, yMax}) => {
       .attr('height', (val) => val)
       .attr('fill', theme.fill)
 
-    update.merge(enter).transition().duration(1000)
+    update.merge(enter).transition().duration(theme.anim_rate)
       .attr('x', (val, idx) => idx)
       .attr('y', (val) => yMax - val)
       .attr('width', 1)
       .attr('height', (val) => val)
 
-    update.exit().transition().duration(1000)
+    update.exit().transition().duration(theme.anim_rate)
       .attr('y', yMax)
       .attr('height', 0)
   });
@@ -53,7 +54,14 @@ export const LineChart = ({xData, yData, yMax}) => {
       .attr('stroke', theme.fill)
       .attr('stroke-width', 0.2)
       .attr('d', line(yData))
-  });
+  }, []);
+
+  useEffect(() => {
+    const line = d3.line().x((val, idx) => idx).y((val) => yMax - val)
+    d3.select(ref.current).selectAll('path')
+      .transition().duration(theme.anim_rate)
+      .attr('d', line(yData))
+  })
 
   return <D3Element ref={ref} />
 }

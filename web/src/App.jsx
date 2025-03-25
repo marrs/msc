@@ -1,10 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as d3 from 'd3'; 
 import './App.css';
-import D3Element from './d3element';
+import Chart from './Chart';
 
 const App = () => {
-  const ref = useRef();
+  const [data, setData] = useState({
+    date: [],
+    frequency: [],
+  });
+
   useEffect(() => {
     async function fetch_data() {
       const rsp = await fetch('http://localhost:8000/sales-data')
@@ -12,37 +16,37 @@ const App = () => {
       return json;
     }
     fetch_data().then(json => {
-      const data = {};
-      const timestamp_for_date = {};
+      const frequency = {};
+      const date_for_timestamp = {};
       const len = json.date.length;
       for (var idx = 0; idx < len; ++idx) {
         let date = json.date[idx];
         let [dt, mth, yr] = date.split('/');
-        data[date] = data[date] + 1 || 0
+        let timestamp = Date.parse([mth, dt, yr].join('/'));
+        frequency[timestamp] = frequency[timestamp] + 1 || 0
 
-        timestamp_for_date[Date.parse([mth, dt, yr].join('/'))] = date;
+        date_for_timestamp[timestamp] = date;
       }
-      const sorted_dates = Object.keys(timestamp_for_date).sort().map(x => timestamp_for_date[x])
+      const sorted_timestamp = Object.keys(date_for_timestamp).sort();
+      const sorted_dates = sorted_timestamp.map(x => date_for_timestamp[x]);
+      const sorted_len = sorted_dates.length;
+      const sorted_frequency = new Array(sorted_len);
+      for (var idx = 0; idx < sorted_len; ++idx) {
+        sorted_frequency[idx] = frequency[sorted_timestamp[idx]];
+      }
 
-      console.log('data', timestamp_for_date);
-      console.log('timestamps', Object.keys(timestamp_for_date).sort());
-      console.log('sorted dates', sorted_dates)
+      setData({
+        frequency: sorted_frequency,
+        date: sorted_dates,
+      });
     });
 
-    const data = [12, 5, 6, 6, 9, 10];
-    const svg = d3.select(ref.current) .attr('width', 500) .attr('height', 100);
-    svg.selectAll('rect')
-      .data(data)
-      .enter()
-      .append('rect')
-      .attr('x', (d, idx) => idx * 30)
-      .attr('y', (val) => 100 - val * 10)
-      .attr('width', 25) .attr('height', (x) => x * 10) .attr('fill', 'teal');
   }, []);
+
   return (
     <div className="content">
-      <h1>Rsbuild with React</h1>
-      <D3Element ref={ref} />
+      <h1>Chart</h1>
+      <Chart xData={data.date} yData={data.frequency} />
     </div>
   );
 };

@@ -26,7 +26,7 @@ export const BarChart = (props) => {
     const { yMax, xData, yData } = props;
     const width = 1000;
     const height = 800;
-    const margin = 20;
+    const margin = 40;
 
     svg = init_svg(svg, {
       width: width + margin * 2,
@@ -101,6 +101,17 @@ export const BarChart = (props) => {
           .call(d3.axisBottom(xScale).ticks(
             d3.timeMonth.every(3)).tickSizeOuter(0)
           );
+    }
+
+    if (yData.length) {
+      const yScale = d3.scaleLinear()
+        .domain([yMax, 0])
+        .range([0, height - margin])
+
+      svg
+        .append("g")
+          .attr("transform", `translate(${margin}, ${0})`)
+          .call(d3.axisLeft(yScale));
     }
 
   });

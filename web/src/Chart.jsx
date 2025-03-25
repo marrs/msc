@@ -8,6 +8,11 @@ const theme = {
     anim_rate: 1000,
 };
 
+function Date_from_date(date) {
+  let [dt, mth, yr] = date.split('/');
+  return new Date(+yr, +mth, +dt);
+}
+
 function init_svg(svg, { width, height }) {
   svg
     .attr('width', width)
@@ -38,8 +43,6 @@ export const BarChart = (props) => {
     function y_unit(x) {
       return x * heightUnit;
     }
-
-    console.log('widthUnit', widthUnit, 'heightUnit', heightUnit)
 
       /*
     svg.append('g')
@@ -87,18 +90,18 @@ export const BarChart = (props) => {
       .attr('height', 0)
 
 
-    /*
-    const xScale = d3.scaleLinear()
-      //.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-      .domain([0, 20])
-      .range([0, 1000])
+    if (xData.length) {
+      const xScale = d3.scaleTime()
+        .domain([Date_from_date(xData.at(0)), Date_from_date(xData.at(-1))])
+        .range([0, width])
 
-
-    svg
-      .append("g")
-        .attr("transform", `translate(${margin}, ${height - margin})`)
-        .call(d3.axisBottom(xScale).tickSizeOuter(0));
-        */
+      svg
+        .append("g")
+          .attr("transform", `translate(${margin}, ${height - margin})`)
+          .call(d3.axisBottom(xScale).ticks(
+            d3.timeMonth.every(3)).tickSizeOuter(0)
+          );
+    }
 
   });
 

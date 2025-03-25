@@ -124,12 +124,14 @@ const App = () => {
     const regional_data = data.by_region[region];
     switch (chart_type) {
       case 'line':
-        return <LineChart xData={regional_data.date}
+        return <LineChart className="center"
+                          xData={regional_data.date}
                           yData={regional_data.frequency}
                           yMax={data.by_region.all.max_frequency} />;
       case 'bar':
       default:
-        return <BarChart xData={regional_data.date}
+        return <BarChart className="center"
+                         xData={regional_data.date}
                          yData={regional_data.frequency}
                          yMax={data.by_region.all.max_frequency} />;
     }

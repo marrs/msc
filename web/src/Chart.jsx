@@ -26,6 +26,8 @@ function init_svg(svg, { width, height }) {
 }
 
 export const BarChart = (props) => {
+  const { className } = props;
+
   const ref = useD3(svg => {
 
     const { yMax, xData, yData } = props;
@@ -117,11 +119,11 @@ export const BarChart = (props) => {
 
   });
 
-  return <D3Element ref={ref} />
+  return <D3Element ref={ref} className={className} />
 }
 
 export const LineChart = (props) => {
-  const { yMax, xData, yData } = props;
+  const { yMax, xData, yData, className } = props;
 
   function x_unit(x) {
     return x * (width - 2 * margin) / xData.length
@@ -145,7 +147,7 @@ export const LineChart = (props) => {
     svg.append('g').append('path')
       .attr('fill', 'none')
       .attr('stroke', theme.fill)
-      .attr('stroke-width', 0.2)
+      .attr('stroke-width', 1)
       .attr('d', line(yData))
 
     if (xData.length) {
@@ -177,10 +179,10 @@ export const LineChart = (props) => {
     const line = d3.line()
       .x((val, idx) => margin + x_unit(idx))
       .y((val) => height - margin - y_unit(val))
-    d3.select(ref.current).selectAll('path')
+    d3.select(ref.current).select('path')
       .transition().duration(theme.anim_rate)
       .attr('d', line(yData))
   })
 
-  return <D3Element ref={ref} />
+  return <D3Element ref={ref} className={className}/>
 }

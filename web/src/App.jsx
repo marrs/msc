@@ -89,6 +89,12 @@ const App = () => {
     fetch_data().then(json => {
       const frequency = {};
       const date_for_timestamp = {};
+      json.region.forEach(region => {
+        if (!region_options[region]) {
+          console.warn("Region option not defined for", region);
+          region_options[region] = region;
+        }
+      });
       set_state_raw_data(json);
       set_state_data({
         by_region: {

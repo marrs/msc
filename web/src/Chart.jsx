@@ -12,7 +12,6 @@ const width = 1000;
 const height = 800;
 const margin = 40;
 
-
 function Date_from_date(date) {
   let [dt, mth, yr] = date.split('/');
   return new Date(+yr, +mth, +dt);

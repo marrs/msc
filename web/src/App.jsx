@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import * as d3 from 'd3'; 
 import './App.css';
-import Chart from './Chart';
+import { BarChart } from './Chart';
 
 const App = () => {
   const [data, setData] = useState({
     date: [],
     frequency: [],
+    max_frequency: 0,
   });
 
   useEffect(() => {
@@ -19,11 +20,15 @@ const App = () => {
       const frequency = {};
       const date_for_timestamp = {};
       const len = json.date.length;
+      let max_frequency = 0;
       for (var idx = 0; idx < len; ++idx) {
         let date = json.date[idx];
         let [dt, mth, yr] = date.split('/');
         let timestamp = Date.parse([mth, dt, yr].join('/'));
         frequency[timestamp] = frequency[timestamp] + 1 || 0
+        if (frequency[timestamp] > max_frequency) {
+          max_frequency = frequency[timestamp];
+        }
 
         date_for_timestamp[timestamp] = date;
       }
@@ -37,6 +42,7 @@ const App = () => {
 
       setData({
         frequency: sorted_frequency,
+        max_frequency,
         date: sorted_dates,
       });
     });
@@ -46,7 +52,7 @@ const App = () => {
   return (
     <div className="content">
       <h1>Chart</h1>
-      <Chart xData={data.date} yData={data.frequency} />
+      <BarChart xData={data.date} yData={data.frequency} yMax={data.max_frequency} />
     </div>
   );
 };

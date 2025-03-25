@@ -2,22 +2,23 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3'; 
 import D3Element from './d3element';
 
-const Chart = ({xData, yData}) => {
-    console.log('xdata', xData);
-    console.log('ydata', yData);
+export const BarChart = ({xData, yData, yMax}) => {
     const ref = useRef();
+    const datalen = xData.length;
     useEffect(() => {
-        const svg = d3.select(ref.current) .attr('width', 500) .attr('height', 100);
+        const svg = d3.select(ref.current)
+            .attr('width', '100vw')
+            .attr('height', '600px')
+            .attr('viewBox', `0, 0, ${datalen}, ${yMax}`)
+            .attr('preserveAspectRatio', 'none')
         svg.selectAll('rect')
             .data(yData)
             .enter()
             .append('rect')
-            .attr('x', (val, idx) => idx * 70)
-            .attr('y', (val) => 100 - val * 10)
-            .attr('width', 65) .attr('height', (val) => val * 10) .attr('fill', 'teal');
+            .attr('x', (val, idx) => idx)
+            .attr('y', (val) => yMax - val)
+            .attr('width', 1) .attr('height', (val) => val) .attr('fill', 'teal');
     });
 
     return <D3Element ref={ref} />
 }
-
-export default Chart; 

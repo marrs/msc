@@ -8,16 +8,20 @@ const theme = {
     anim_rate: 1000,
 };
 
-export const BarChart = ({xData, yData, yMax}) => {
+function init_svg(svg, { xData, yData, yMax }) {
+  const datalen = xData.length;
+  svg.attr('width', '100vw')
+    .attr('height', '600px')
+    .attr('viewBox', `0, 0, ${datalen}, ${yMax}`)
+    .attr('preserveAspectRatio', 'none')
+  return svg;
+}
+
+export const BarChart = (props) => {
   const ref = useD3(svg => {
-    const datalen = xData.length;
 
-    svg.attr('width', '100vw')
-      .attr('height', '600px')
-      .attr('viewBox', `0, 0, ${datalen}, ${yMax}`)
-      .attr('preserveAspectRatio', 'none')
-
-    const update = svg.selectAll('rect').data(yData);
+    const { yMax, yData } = props;
+    const update = init_svg(svg, props).selectAll('rect').data(yData);
 
     const enter = update.enter()
       .append('rect')
@@ -41,14 +45,14 @@ export const BarChart = ({xData, yData, yMax}) => {
   return <D3Element ref={ref} />
 }
 
-export const LineChart = ({xData, yData, yMax}) => {
+export const LineChart = (props) => {
+  const { yMax, xData, yData } = props;
+
   const ref = useD3(svg => {
     const datalen = xData.length;
     const line = d3.line().x((val, idx) => idx).y((val) => yMax - val)
-    svg.attr('width', '100vw')
-      .attr('height', '600px')
-      .attr('viewBox', `0, 0, ${datalen}, ${yMax}`)
-      .attr('preserveAspectRatio', 'none')
+
+    init_svg(svg, props);
     svg.append('path')
       .attr('fill', 'none')
       .attr('stroke', theme.fill)

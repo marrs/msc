@@ -4,11 +4,13 @@ import './App.css';
 import { BarChart, LineChart } from './Chart';
 
 const App = () => {
-  const [data, setData] = useState({
+  const [data, set_data] = useState({
     date: [],
     frequency: [],
     max_frequency: 0,
   });
+
+  const [selected_chart, set_selected_chart] = useState("bar");
 
   useEffect(() => {
     async function fetch_data() {
@@ -40,7 +42,7 @@ const App = () => {
         sorted_frequency[idx] = frequency[sorted_timestamp[idx]];
       }
 
-      setData({
+      set_data({
         frequency: sorted_frequency,
         max_frequency,
         date: sorted_dates,
@@ -49,11 +51,37 @@ const App = () => {
 
   }, []);
 
+  function handle_select(el, y, z) {
+    set_selected_chart(el.target.value);
+  }
+
+  function select_chart_component(chart_type, data) {
+    switch (chart_type) {
+      case 'line':
+        return <LineChart xData={data.date}
+                          yData={data.frequency}
+                          yMax={data.max_frequency} />;
+      case 'bar':
+      default:
+        return <BarChart xData={data.date}
+                         yData={data.frequency}
+                         yMax={data.max_frequency} />;
+    }
+  }
+
   return (
-    <div className="content">
-      <h1>Chart</h1>
-      <LineChart xData={data.date} yData={data.frequency} yMax={data.max_frequency} />
-    </div>
+    <>
+      <div className="controls">
+        <select value={selected_chart} onChange={handle_select}>
+          <option value="bar">Bar</option>
+          <option value="line">Line</option>
+        </select>
+      </div>
+      <div className="content">
+        <h1>Chart</h1>
+        {select_chart_component(selected_chart, data)}
+      </div>
+    </>
   );
 };
 

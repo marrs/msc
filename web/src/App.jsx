@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as d3 from 'd3'; 
 import './App.css';
-import { BarChart } from './Chart';
+import { BarChart, LineChart } from './Chart';
 
 const App = () => {
   const [data, setData] = useState({
@@ -52,7 +52,7 @@ const App = () => {
   return (
     <div className="content">
       <h1>Chart</h1>
-      <BarChart xData={data.date} yData={data.frequency} yMax={data.max_frequency} />
+      <LineChart xData={data.date} yData={data.frequency} yMax={data.max_frequency} />
     </div>
   );
 };

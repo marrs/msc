@@ -12,7 +12,6 @@ const App = () => {
       return json;
     }
     fetch_data().then(json => {
-      console.log('json', json);
       const data = {};
       const timestamp_for_date = {};
       const len = json.date.length;
@@ -21,11 +20,13 @@ const App = () => {
         let [dt, mth, yr] = date.split('/');
         data[date] = data[date] + 1 || 0
 
-        timestamp_for_date[date] = Date.parse([mth, dt, yr].join('/'));
+        timestamp_for_date[Date.parse([mth, dt, yr].join('/'))] = date;
       }
-      console.log('data', data);
-      console.log('timestamps', Object.values(timestamp_for_date).sort());
-      console.log('sorted dates', Object.values(timestamp_for_date).sort().map(x => timestamp_for_date[x]))
+      const sorted_dates = Object.keys(timestamp_for_date).sort().map(x => timestamp_for_date[x])
+
+      console.log('data', timestamp_for_date);
+      console.log('timestamps', Object.keys(timestamp_for_date).sort());
+      console.log('sorted dates', sorted_dates)
     });
 
     const data = [12, 5, 6, 6, 9, 10];

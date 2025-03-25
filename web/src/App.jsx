@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import './App.css';
 import { BarChart, LineChart } from './Chart';
 
-const region_options = {
+const region_labels = {
   all: 'All regions',
   IT: 'Italy',
   FR: 'France',
@@ -90,9 +90,9 @@ const App = () => {
       const frequency = {};
       const date_for_timestamp = {};
       json.region.forEach(region => {
-        if (!region_options[region]) {
+        if (!region_labels[region]) {
           console.warn("Region option not defined for", region);
-          region_options[region] = region;
+          region_labels[region] = region;
         }
       });
       set_state_raw_data(json);
@@ -143,13 +143,13 @@ const App = () => {
           <option value="line">Line chart</option>
         </select>
         <select value={ui_state_region} onChange={handle_select_region}>
-          {Object.keys(region_options).map(ky => {
-            return <option key={ky} value={ky}>{region_options[ky]}</option>
+          {Object.keys(region_labels).map(ky => {
+            return <option key={ky} value={ky}>{region_labels[ky]}</option>
           })}
         </select>
       </div>
       <div className="content">
-        <h1>Chart</h1>
+        <h1>{region_labels[ui_state_region]}</h1>
         {select_chart_component(ui_state_chart_type, state_data, ui_state_region)}
       </div>
     </>

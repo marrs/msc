@@ -4,13 +4,14 @@ import './App.css';
 import { BarChart, LineChart } from './Chart';
 
 const App = () => {
-  const [data, set_data] = useState({
+  const [state_data, set_state_data] = useState({
     date: [],
     frequency: [],
     max_frequency: 0,
   });
 
-  const [selected_chart, set_selected_chart] = useState("bar");
+  const [state_chart_type, set_state_chart_type] = useState("bar");
+  const [state_selected_region, set_state_selected_region] = useState("all");
 
   useEffect(() => {
     async function fetch_data() {
@@ -22,6 +23,7 @@ const App = () => {
       const frequency = {};
       const date_for_timestamp = {};
       const len = json.date.length;
+      console.log('json', json);
       let max_frequency = 0;
       for (var idx = 0; idx < len; ++idx) {
         let date = json.date[idx];
@@ -42,7 +44,7 @@ const App = () => {
         sorted_frequency[idx] = frequency[sorted_timestamp[idx]];
       }
 
-      set_data({
+      set_state_data({
         frequency: sorted_frequency,
         max_frequency,
         date: sorted_dates,
@@ -51,8 +53,12 @@ const App = () => {
 
   }, []);
 
-  function handle_select(el, y, z) {
-    set_selected_chart(el.target.value);
+  function handle_select_chart(el) {
+    set_state_chart_type(el.target.value);
+  }
+
+  function handle_select_region(el) {
+    set_state_selected_region(el.target.value);
   }
 
   function select_chart_component(chart_type, data) {
@@ -72,14 +78,18 @@ const App = () => {
   return (
     <>
       <div className="controls">
-        <select value={selected_chart} onChange={handle_select}>
-          <option value="bar">Bar</option>
-          <option value="line">Line</option>
+        <select value={state_chart_type} onChange={handle_select_chart}>
+          <option value="bar">Bar chart</option>
+          <option value="line">Line chart</option>
+        </select>
+        <select value={state_selected_region} onChange={handle_select_region}>
+          <option value="all">All regions</option>
+          {}
         </select>
       </div>
       <div className="content">
         <h1>Chart</h1>
-        {select_chart_component(selected_chart, data)}
+        {select_chart_component(state_chart_type, state_data)}
       </div>
     </>
   );

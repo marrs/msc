@@ -2,6 +2,10 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3'; 
 import D3Element from './d3element';
 
+const theme = {
+    fill: 'teal'
+};
+
 export const BarChart = ({xData, yData, yMax}) => {
     const ref = useRef();
     const datalen = xData.length;
@@ -17,7 +21,7 @@ export const BarChart = ({xData, yData, yMax}) => {
             .append('rect')
             .attr('x', (val, idx) => idx)
             .attr('y', (val) => yMax - val)
-            .attr('width', 1) .attr('height', (val) => val) .attr('fill', 'teal');
+            .attr('width', 1) .attr('height', (val) => val) .attr('fill', theme.fill);
     });
 
     return <D3Element ref={ref} />
@@ -36,7 +40,7 @@ export const LineChart = ({xData, yData, yMax}) => {
             .attr('preserveAspectRatio', 'none')
         svg.append('path')
             .attr('fill', 'none')
-            .attr('stroke', 'teal')
+            .attr('stroke', theme.fill)
             .attr('stroke-width', 0.2)
             .attr('d', line(yData))
     });

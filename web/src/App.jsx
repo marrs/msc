@@ -67,18 +67,20 @@ const App = () => {
     const len = raw_data.date.length;
     for (var idx = 0; idx < len; ++idx) {
       const timestamp = timestamp_from_date(raw_data.date[idx]);
+
+      date_for_timestamp[timestamp] = raw_data.date[idx];
+      frequency[timestamp] = frequency[timestamp] || 0
+
       if (region === 'all') {
-        frequency[timestamp] = frequency[timestamp] + 1 || 0
+        frequency[timestamp] = frequency[timestamp] + 1;
         if (frequency[timestamp] > max_frequency) {
           max_frequency = frequency[timestamp];
         }
-        date_for_timestamp[timestamp] = raw_data.date[idx];
       } else if (raw_data.region[idx] === region) {
-        frequency[timestamp] = frequency[timestamp] + 1 || 0
+        frequency[timestamp] = frequency[timestamp] + 1;
         if (frequency[timestamp] > max_frequency) {
           max_frequency = frequency[timestamp];
         }
-        date_for_timestamp[timestamp] = raw_data.date[idx];
       }
     }
 

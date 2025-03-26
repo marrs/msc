@@ -35,6 +35,32 @@ function init_svg(svg, { width, height }) {
   return svg;
 }
 
+function paint_axes(svg, xData, yData, yMax) {
+    if (xData.length) {
+      const xScale = d3.scaleTime()
+        .domain([Date_from_date(xData.at(0)), Date_from_date(xData.at(-1))])
+        .range([0, width])
+
+      svg
+        .append("g")
+          .attr("transform", `translate(${xOffset}, ${yOffset})`)
+          .call(d3.axisBottom(xScale).ticks(
+            d3.timeMonth.every(3)).tickSizeOuter(0)
+          );
+    }
+
+    if (yData.length) {
+      const yScale = d3.scaleLinear()
+        .domain([yMax, 0])
+        .range([0, yOffset])
+
+      svg
+        .append("g")
+          .attr("transform", `translate(${xOffset}, ${0})`)
+          .call(d3.axisLeft(yScale));
+    }
+}
+
 export const BarChart = (props) => {
   const { className } = props;
 
@@ -103,29 +129,7 @@ export const BarChart = (props) => {
       .attr('height', 0)
 
 
-    if (xData.length) {
-      const xScale = d3.scaleTime()
-        .domain([Date_from_date(xData.at(0)), Date_from_date(xData.at(-1))])
-        .range([0, width])
-
-      svg
-        .append("g")
-          .attr("transform", `translate(${xOffset}, ${yOffset})`)
-          .call(d3.axisBottom(xScale).ticks(
-            d3.timeMonth.every(3)).tickSizeOuter(0)
-          );
-    }
-
-    if (yData.length) {
-      const yScale = d3.scaleLinear()
-        .domain([yMax, 0])
-        .range([0, yOffset])
-
-      svg
-        .append("g")
-          .attr("transform", `translate(${xOffset}, ${0})`)
-          .call(d3.axisLeft(yScale));
-    }
+    paint_axes(svg, xData, yData, yMax);
 
   });
 
@@ -160,29 +164,7 @@ export const LineChart = (props) => {
       .attr('stroke-width', 1)
       .attr('d', line(yData))
 
-    if (xData.length) {
-      const xScale = d3.scaleTime()
-        .domain([Date_from_date(xData.at(0)), Date_from_date(xData.at(-1))])
-        .range([0, width])
-
-      svg
-        .append("g")
-          .attr("transform", `translate(${xOffset}, ${yOffset})`)
-          .call(d3.axisBottom(xScale).ticks(
-            d3.timeMonth.every(3)).tickSizeOuter(0)
-          );
-    }
-
-    if (yData.length) {
-      const yScale = d3.scaleLinear()
-        .domain([yMax, 0])
-        .range([0, yOffset])
-
-      svg
-        .append("g")
-          .attr("transform", `translate(${xOffset}, ${0})`)
-          .call(d3.axisLeft(yScale));
-    }
+    paint_axes(svg, xData, yData, yMax);
   }, []);
 
   useEffect(() => {

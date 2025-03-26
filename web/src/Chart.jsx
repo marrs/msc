@@ -12,6 +12,17 @@ const width = 1000;
 const height = 800;
 const margin = 40;
 
+const xOffset = margin;
+const yOffset = height - margin;
+
+function offset_x(x) {
+  return xOffset + x;
+}
+
+function offset_y(x) {
+  return yOffset - x;
+}
+
 function Date_from_date(date) {
   let [dt, mth, yr] = date.split('/');
   return new Date(+yr, +mth, +dt);
@@ -53,15 +64,15 @@ export const BarChart = (props) => {
       .join(
         enter => enter
           .append('rect')
-          .attr('x', (val, idx) => margin + x_unit(idx))
-          .attr('y', (val) => height - margin - y_unit(val))
+          .attr('x', (val, idx) => offset_x(x_unit(idx)))
+          .attr('y', (val) => offset_y(y_unit(val)))
           .attr('width', widthUnit)
           .attr('height', (val) => y_unit(val))
           .attr('fill', theme.fill),
         update => update
           .transition(svg.transition().duration(theme.anim_rate))
-          .attr('x', (val, idx) => margin + x_unit(idx))
-          .attr('y', (val) => height - margin - y_unit(val))
+          .attr('x', (val, idx) => offset_x(x_unit(idx)))
+          .attr('y', (val) => offset_y(y_unit(val)))
           .attr('width', widthUnit)
           .attr('height', (val) => y_unit(val)),
         exit => exit
@@ -75,15 +86,15 @@ export const BarChart = (props) => {
 
     const enter = update.enter()
       .append('rect')
-      .attr('x', (val, idx) => margin + x_unit(idx))
-      .attr('y', (val) => height - margin - y_unit(val))
+      .attr('x', (val, idx) => offset_x(x_unit(idx)))
+      .attr('y', (val) => offset_y(y_unit(val)))
       .attr('width', x_unit(1))
       .attr('height', (val) => y_unit(val))
       .attr('fill', theme.fill)
 
     update.merge(enter).transition().duration(theme.anim_rate)
-      .attr('x', (val, idx) => margin + x_unit(idx))
-      .attr('y', (val) => height - margin - y_unit(val))
+      .attr('x', (val, idx) => offset_x(x_unit(idx)))
+      .attr('y', (val) => offset_y(y_unit(val)))
       .attr('width', x_unit(1))
       .attr('height', (val) => y_unit(val)),
 
@@ -99,7 +110,7 @@ export const BarChart = (props) => {
 
       svg
         .append("g")
-          .attr("transform", `translate(${margin}, ${height - margin})`)
+          .attr("transform", `translate(${xOffset}, ${yOffset})`)
           .call(d3.axisBottom(xScale).ticks(
             d3.timeMonth.every(3)).tickSizeOuter(0)
           );
@@ -108,11 +119,11 @@ export const BarChart = (props) => {
     if (yData.length) {
       const yScale = d3.scaleLinear()
         .domain([yMax, 0])
-        .range([0, height - margin])
+        .range([0, yOffset])
 
       svg
         .append("g")
-          .attr("transform", `translate(${margin}, ${0})`)
+          .attr("transform", `translate(${xOffset}, ${0})`)
           .call(d3.axisLeft(yScale));
     }
 
@@ -135,8 +146,8 @@ export const LineChart = (props) => {
   const ref = useD3(svg => {
     const datalen = xData.length;
     const line = d3.line()
-      .x((val, idx) => margin + x_unit(idx))
-      .y((val) => height - margin - y_unit(val))
+      .x((val, idx) => offset_x(x_unit(idx)))
+      .y((val) => offset_y(y_unit(val)))
 
     svg = init_svg(svg, {
       width: width + margin * 2,
@@ -156,7 +167,7 @@ export const LineChart = (props) => {
 
       svg
         .append("g")
-          .attr("transform", `translate(${margin}, ${height - margin})`)
+          .attr("transform", `translate(${xOffset}, ${yOffset})`)
           .call(d3.axisBottom(xScale).ticks(
             d3.timeMonth.every(3)).tickSizeOuter(0)
           );
@@ -165,19 +176,19 @@ export const LineChart = (props) => {
     if (yData.length) {
       const yScale = d3.scaleLinear()
         .domain([yMax, 0])
-        .range([0, height - margin])
+        .range([0, yOffset])
 
       svg
         .append("g")
-          .attr("transform", `translate(${margin}, ${0})`)
+          .attr("transform", `translate(${xOffset}, ${0})`)
           .call(d3.axisLeft(yScale));
     }
   }, []);
 
   useEffect(() => {
     const line = d3.line()
-      .x((val, idx) => margin + x_unit(idx))
-      .y((val) => height - margin - y_unit(val))
+      .x((val, idx) => offset_x(x_unit(idx)))
+      .y((val) => offset_y(y_unit(val)))
     d3.select(ref.current).select('path')
       .transition().duration(theme.anim_rate)
       .attr('d', line(yData))

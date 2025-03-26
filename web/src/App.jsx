@@ -23,62 +23,62 @@ function timestamp_from_date(date) {
 }
 
 function init_state_data() {
-  const data = { by_region: {}};
+  const data = { byRegion: {}};
 }
 
 function init_frequency_data(raw_data, region='all') {
   const frequency = {};
-  let max_frequency = 0;
-  const date_for_timestamp = {};
+  let maxFrequency = 0;
+  const dateForTimestamp = {};
   const len = raw_data.date.length;
   for (var idx = 0; idx < len; ++idx) {
     const timestamp = timestamp_from_date(raw_data.date[idx]);
 
-    date_for_timestamp[timestamp] = raw_data.date[idx];
+    dateForTimestamp[timestamp] = raw_data.date[idx];
     frequency[timestamp] = frequency[timestamp] || 0
 
     if (region === 'all') {
       frequency[timestamp] = frequency[timestamp] + 1;
-      if (frequency[timestamp] > max_frequency) {
-        max_frequency = frequency[timestamp];
+      if (frequency[timestamp] > maxFrequency) {
+        maxFrequency = frequency[timestamp];
       }
     } else if (raw_data.region[idx] === region) {
       frequency[timestamp] = frequency[timestamp] + 1;
-      if (frequency[timestamp] > max_frequency) {
-        max_frequency = frequency[timestamp];
+      if (frequency[timestamp] > maxFrequency) {
+        maxFrequency = frequency[timestamp];
       }
     }
   }
 
-  const sorted_timestamp = Object.keys(date_for_timestamp).sort();
-  const sorted_dates = sorted_timestamp.map(x => date_for_timestamp[x]);
-  const sorted_len = sorted_dates.length;
-  const sorted_frequency = new Array(sorted_len);
-  for (var idx = 0; idx < sorted_len; ++idx) {
-    sorted_frequency[idx] = frequency[sorted_timestamp[idx]];
+  const sortedTimestamp = Object.keys(dateForTimestamp).sort();
+  const sortedDates = sortedTimestamp.map(x => dateForTimestamp[x]);
+  const sortedLen = sortedDates.length;
+  const sortedFrequency = new Array(sortedLen);
+  for (var idx = 0; idx < sortedLen; ++idx) {
+    sortedFrequency[idx] = frequency[sortedTimestamp[idx]];
   }
 
   return {
-    frequency: sorted_frequency,
-    max_frequency,
-    date: sorted_dates,
+    frequency: sortedFrequency,
+    maxFrequency,
+    date: sortedDates,
   };
 }
 
 const App = () => {
-  const [state_data, set_state_data] = useState({
-    by_region: {
+  const [stateData, set_state_data] = useState({
+    byRegion: {
       all: {
         date: [],
         frequency: [],
-        max_frequency: 0,
+        maxFrequency: 0,
       },
     },
   });
-  const [state_raw_data, set_state_raw_data] = useState();
+  const [stateRawData, set_state_raw_data] = useState();
 
-  const [ui_state_chart_type, set_ui_state_chart_type] = useState("bar");
-  const [ui_state_region, set_ui_state_region] = useState("all");
+  const [uiStateChartType, set_ui_state_chart_type] = useState("bar");
+  const [uiStateRegion, set_ui_state_region] = useState("all");
 
   useEffect(() => {
     async function fetch_data() {
@@ -88,7 +88,7 @@ const App = () => {
     }
     fetch_data().then(json => {
       const frequency = {};
-      const date_for_timestamp = {};
+      const dateForTimestamp = {};
       json.region.forEach(region => {
         if (!region_labels[region]) {
           console.warn("Region option not defined for", region);
@@ -97,7 +97,7 @@ const App = () => {
       });
       set_state_raw_data(json);
       set_state_data({
-        by_region: {
+        byRegion: {
           all: init_frequency_data(json),
         },
       });
@@ -111,48 +111,48 @@ const App = () => {
 
   function handle_select_region(el) {
     const selected_region = el.target.value;
-    if (!state_data.by_region[selected_region]) {
-      const new_data = Object.assign({}, state_data);
-      new_data.by_region[selected_region] =
-        init_frequency_data(state_raw_data, selected_region);
+    if (!stateData.byRegion[selected_region]) {
+      const new_data = Object.assign({}, stateData);
+      new_data.byRegion[selected_region] =
+        init_frequency_data(stateRawData, selected_region);
       set_state_data(new_data);
     }
     set_ui_state_region(selected_region);
   }
 
   function select_chart_component(chart_type, data, region) {
-    const regional_data = data.by_region[region];
+    const regional_data = data.byRegion[region];
     switch (chart_type) {
       case 'line':
         return <LineChart className="center"
                           xData={regional_data.date}
                           yData={regional_data.frequency}
-                          yMax={data.by_region.all.max_frequency} />;
+                          yMax={data.byRegion.all.maxFrequency} />;
       case 'bar':
       default:
         return <BarChart className="center"
                          xData={regional_data.date}
                          yData={regional_data.frequency}
-                         yMax={data.by_region.all.max_frequency} />;
+                         yMax={data.byRegion.all.maxFrequency} />;
     }
   }
 
   return (
     <>
       <div className="controls">
-        <select value={ui_state_chart_type} onChange={handle_select_chart}>
+        <select value={uiStateChartType} onChange={handle_select_chart}>
           <option value="bar">Bar chart</option>
           <option value="line">Line chart</option>
         </select>
-        <select value={ui_state_region} onChange={handle_select_region}>
+        <select value={uiStateRegion} onChange={handle_select_region}>
           {Object.keys(region_labels).map(ky => {
             return <option key={ky} value={ky}>{region_labels[ky]}</option>
           })}
         </select>
       </div>
       <div className="content">
-        <h1>{region_labels[ui_state_region]}</h1>
-        {select_chart_component(ui_state_chart_type, state_data, ui_state_region)}
+        <h1>{region_labels[uiStateRegion]}</h1>
+        {select_chart_component(uiStateChartType, stateData, uiStateRegion)}
       </div>
     </>
   );

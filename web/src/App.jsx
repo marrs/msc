@@ -17,24 +17,24 @@ const region_labels = {
   SE: 'Sweden',
 }
 
+function match(pattern, options) {
+  return options[pattern] || options._;
+}
+
 function timestamp_from_date(date) {
   let [dt, mth, yr] = date.split('/');
   return Date.parse([mth, dt, yr].join('/'));
 }
 
-function init_state_data() {
-  const data = { byRegion: {}};
-}
-
-function init_frequency_data(raw_data, region='all') {
+function init_frequency_data(rawData, region='all') {
   const frequency = {};
   let maxFrequency = 0;
   const dateForTimestamp = {};
-  const len = raw_data.date.length;
+  const len = rawData.date.length;
   for (var idx = 0; idx < len; ++idx) {
-    const timestamp = timestamp_from_date(raw_data.date[idx]);
+    const timestamp = timestamp_from_date(rawData.date[idx]);
 
-    dateForTimestamp[timestamp] = raw_data.date[idx];
+    dateForTimestamp[timestamp] = rawData.date[idx];
     frequency[timestamp] = frequency[timestamp] || 0
 
     if (region === 'all') {
@@ -42,7 +42,7 @@ function init_frequency_data(raw_data, region='all') {
       if (frequency[timestamp] > maxFrequency) {
         maxFrequency = frequency[timestamp];
       }
-    } else if (raw_data.region[idx] === region) {
+    } else if (rawData.region[idx] === region) {
       frequency[timestamp] = frequency[timestamp] + 1;
       if (frequency[timestamp] > maxFrequency) {
         maxFrequency = frequency[timestamp];
@@ -120,23 +120,7 @@ const App = () => {
     set_ui_state_region(selected_region);
   }
 
-  function select_chart_component(chart_type, data, region) {
-    const regional_data = data.byRegion[region];
-    switch (chart_type) {
-      case 'line':
-        return <LineChart className="center"
-                          xData={regional_data.date}
-                          yData={regional_data.frequency}
-                          yMax={data.byRegion.all.maxFrequency} />;
-      case 'bar':
-      default:
-        return <BarChart className="center"
-                         xData={regional_data.date}
-                         yData={regional_data.frequency}
-                         yMax={data.byRegion.all.maxFrequency} />;
-    }
-  }
-
+  const regionalData = stateData.byRegion[uiStateRegion];
   return (
     <>
       <div className="controls">
@@ -152,7 +136,20 @@ const App = () => {
       </div>
       <div className="content">
         <h1>{region_labels[uiStateRegion]}</h1>
-        {select_chart_component(uiStateChartType, stateData, uiStateRegion)}
+        {match(uiStateChartType, {
+          line: <LineChart className="center"
+                           xData={regionalData.date}
+                           yData={regionalData.frequency}
+                           yMax={stateData.byRegion.all.maxFrequency} />,
+          bar: <BarChart className="center"
+                         xData={regionalData.date}
+                         yData={regionalData.frequency}
+                         yMax={stateData.byRegion.all.maxFrequency} />,
+          _: <BarChart className="center"
+                         xData={regionalData.date}
+                         yData={regionalData.frequency}
+                         yMax={stateData.byRegion.all.maxFrequency} />,
+        })}
       </div>
     </>
   );

@@ -128,7 +128,6 @@ export const BarChart = (props) => {
       .attr('y', y_unit(yMax))
       .attr('height', 0)
 
-
     paint_axes(svg, xData, yData, yMax);
 
   });
